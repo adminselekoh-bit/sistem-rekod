@@ -4,33 +4,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sistem Rekod Kerja & Hasil Kebun Kelapa</title>
+<title>Sistem Rekod Selekoh</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 <style>
-:root{--green:#175b43;--light:#f3f6f5;--line:#dce5e0;--red:#b83232}
-*{box-sizing:border-box}body{margin:0;font:15px Arial,sans-serif;background:var(--light);color:#24332c}
-header{background:var(--green);color:white;padding:22px 14px;text-align:center}
-main{max-width:1200px;margin:22px auto;padding:0 14px}
-nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
-button{border:0;border-radius:7px;padding:10px 13px;background:var(--green);color:white;cursor:pointer;margin:3px}
-button.secondary{background:#53677a}button.danger{background:var(--red)}button:disabled{opacity:.5;cursor:not-allowed}
-.card{background:white;padding:18px;border-radius:11px;margin-bottom:16px;box-shadow:0 2px 9px #0000000b}
-h2{color:var(--green);margin-top:0}h3{margin:7px 0}
-input,textarea,select{width:100%;padding:10px;border:1px solid #cbd7d0;border-radius:7px;margin:6px 0 12px;font:inherit}
-label{font-weight:bold}.hidden{display:none!important}.small{font-size:13px;color:#64746b}
-.status{padding:10px;border-radius:7px;background:#e9f2ec;margin-bottom:14px}.error{background:#fdeaea;color:#9c2222}.success{background:#e5f5e9;color:#175b43}
-.table-wrap{overflow-x:auto;margin-top:12px}table{width:100%;border-collapse:collapse;min-width:760px}
-th,td{padding:10px 9px;border:1px solid var(--line);text-align:left;vertical-align:top}
-th{background:#eaf2ed;color:#234c39}tfoot td{font-weight:bold;background:#f3f7f4}
-.money{white-space:nowrap;text-align:right}.right{text-align:right}.actions{white-space:nowrap}
-.pill{display:inline-block;border-radius:20px;padding:4px 8px;background:#e9f2ec;font-size:12px}
-.done{text-decoration:line-through;color:#87918b}.taskline{display:flex;gap:8px;align-items:center;margin:5px 0}
-.taskline input{width:auto;margin:0}.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
-.summary{font-size:20px;font-weight:bold;color:var(--green)}.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.menu-item{border:1px solid var(--line);border-radius:9px;padding:16px}
-pre{white-space:pre-wrap;word-break:break-word}
-@media(max-width:600px){header h1{font-size:22px}.card{padding:13px}button{padding:9px 10px}}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6f4;color:#26352d;font:15px Arial,sans-serif}
+header{background:#175b43;color:white;text-align:center;padding:22px 12px}
+main{max-width:1200px;margin:20px auto;padding:0 12px}
+nav{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:15px}
+button{border:0;border-radius:6px;padding:10px 13px;margin:3px;background:#175b43;color:white;cursor:pointer}
+button.secondary{background:#53677a}
+button.danger{background:#b83232}
+.card{background:white;border-radius:10px;padding:17px;margin-bottom:15px;box-shadow:0 2px 8px #0000000b}
+h2{color:#175b43;margin-top:0}
+input,textarea,select{width:100%;padding:10px;border:1px solid #ccd8d0;border-radius:6px;margin:6px 0 12px;font:inherit}
+label{font-weight:bold}
+.hidden{display:none!important}
+.small{font-size:13px;color:#66756c}
+.status{padding:10px;background:#e7f1e9;border-radius:6px;margin-bottom:12px}
+.error{background:#fdeaea;color:#a22}
+.success{background:#e5f5e9;color:#175b43}
+.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.table-wrap{overflow-x:auto;margin:12px 0}
+table{width:100%;border-collapse:collapse;min-width:700px}
+th,td{border:1px solid #dce5df;padding:9px;text-align:left;vertical-align:top}
+th{background:#eaf2ed;color:#234c39}
+tfoot td{font-weight:bold;background:#f3f7f4}
+.money{text-align:right;white-space:nowrap}
+.summary{font-size:19px;font-weight:bold;color:#175b43;margin-top:15px}
+.taskline{display:flex;align-items:center;gap:7px;margin:5px 0}
+.taskline input{width:auto;margin:0}
+.done{text-decoration:line-through;color:#888}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.menu-item{border:1px solid #dce5df;border-radius:8px;padding:14px}
+@media(max-width:600px){header h1{font-size:22px}.card{padding:12px}}
 </style>
 </head>
 <body>
@@ -38,8 +46,10 @@ pre{white-space:pre-wrap;word-break:break-word}
 <h1>Sistem Rekod Kerja & Hasil Kebun Kelapa</h1>
 <p>Pengurusan rekod secara online</p>
 </header>
+
 <main>
-<div id="connection" class="status">Sedang menyambung ke pangkalan data...</div>
+<div id="connection" class="status">Menyambung ke pangkalan data...</div>
+
 <nav>
 <button onclick="showPage('home')">Laman Utama</button>
 <button onclick="showPage('work')">Rekod Kerja</button>
@@ -53,89 +63,140 @@ pre{white-space:pre-wrap;word-break:break-word}
 <div class="card">
 <h2>Menu Utama</h2>
 <div class="menu-grid">
-<div class="menu-item"><h3>Rekod Kerja</h3><p>Rekod pekerja, tugasan, status dan gaji.</p><button onclick="showPage('work')">Buka Rekod Kerja</button></div>
-<div class="menu-item"><h3>Rekod Hasil Kebun Kelapa</h3><p>Rekod hasil, kuantiti dan wang diterima.</p><button onclick="showPage('sales')">Buka Rekod Hasil</button></div>
-<div class="menu-item"><h3>Rekod Tambahan</h3><p>Bahagian rekod lain yang dicipta oleh admin.</p><button onclick="showPage('extra')">Buka Rekod Tambahan</button></div>
+<div class="menu-item">
+<h3>Rekod Kerja</h3>
+<p>Rekod pekerja, tugasan dan gaji.</p>
+<button onclick="showPage('work')">Buka Rekod Kerja</button>
+</div>
+<div class="menu-item">
+<h3>Rekod Hasil Kebun Kelapa</h3>
+<p>Rekod hasil, kuantiti dan wang diterima.</p>
+<button onclick="showPage('sales')">Buka Rekod Hasil</button>
+</div>
+<div class="menu-item">
+<h3>Rekod Tambahan</h3>
+<p>Rekod perbelanjaan dan rekod lain.</p>
+<button onclick="showPage('extra')">Buka Rekod Tambahan</button>
+</div>
 </div>
 </div>
 </section>
 
 <section id="login" class="hidden">
-<div class="card"><h2>Login Admin</h2>
+<div class="card">
+<h2>Login Admin</h2>
 <form onsubmit="login(event)">
-<label>E-mel admin</label><input id="email" type="email" required>
-<label>Kata laluan</label><input id="password" type="password" required>
+<label>E-mel admin</label>
+<input id="email" type="email" required>
+<label>Kata laluan</label>
+<input id="password" type="password" required>
 <button type="submit">Login</button>
-</form><div id="loginMessage"></div>
+</form>
+<div id="loginMessage"></div>
 </div>
 </section>
 
 <section id="work" class="hidden">
 <div class="card">
 <h2>Rekod Kerja</h2>
-<p class="small">Rekod dipisahkan mengikut bulan, tempat kerja dan nama pekerja. Nama pekerja yang sama di tempat yang sama dalam bulan yang sama akan dikumpulkan dalam satu jadual.</p>
+<p class="small">Rekod digabungkan mengikut bulan, tempat kerja dan nama pekerja. Tarikh kerja berlainan akan menjadi baris dalam jadual yang sama.</p>
+
 <div id="workForm" class="hidden">
 <form onsubmit="addWork(event)">
 <div class="formgrid">
-<div><label>Tarikh kerja</label><input id="workDate" type="date" required></div>
-<div><label>Tempat kerja / daerah</label><input id="project" list="workPlaces" required placeholder="Pilih atau taip tempat kerja"><datalist id="workPlaces"><option value="Bagan Datuk"><option value="Tapah"><option value="Selekoh"></datalist><div class="small">Boleh pilih Bagan Datuk / Tapah atau taip nama tempat lain.</div></div>
-<div><label>Nama pekerja</label><input id="worker" required></div>
-<div><label>Gaji diambil (RM)</label><input id="wage" type="number" min="0" step="0.01" value="0" required></div>
+<div>
+<label>Tarikh kerja</label>
+<input id="workDate" type="date" required>
+</div>
+<div>
+<label>Tempat kerja / daerah</label>
+<input id="project" list="workPlaces" placeholder="Pilih atau taip tempat" required>
+<datalist id="workPlaces">
+<option value="Bagan Datuk">
+<option value="Tapah">
+<option value="Selekoh">
+<option value="Teluk Intan">
+</datalist>
+</div>
+<div>
+<label>Nama pekerja</label>
+<input id="worker" placeholder="Nama pekerja" required>
+</div>
+<div>
+<label>Gaji (RM)</label>
+<input id="wage" type="number" min="0" step="0.01" value="0" required>
+</div>
 </div>
 <label>Senarai tugasan (satu tugasan setiap baris)</label>
-<textarea id="tasks" rows="4" placeholder="Memasang paip&#10;Mengecat dinding"></textarea>
+<textarea id="tasks" rows="4" placeholder="Membersihkan kebun&#10;Memotong rumput"></textarea>
 <button type="submit">Simpan Rekod Kerja</button>
 </form>
 </div>
-<div id="workPermission" class="small">Paparan awam: boleh melihat rekod. Admin perlu login untuk menambah atau mengubah rekod.</div>
+<div id="workPermission" class="small">Paparan awam sahaja. Admin perlu login untuk mengurus rekod.</div>
 </div>
+
 <div class="card">
 <h2>Jadual Rekod Kerja</h2>
 <button onclick="loadAll()">Muat Semula</button>
-<span class="small">Setiap jadual mempunyai butang PDF sendiri untuk dimuat turun secara berasingan.</span>
-<div class="table-wrap" id="workList">Memuatkan rekod...</div>
+<div id="workList">Memuatkan rekod...</div>
 <div class="summary" id="wageGrandTotal">Jumlah gaji: RM 0.00</div>
 </div>
 </section>
 
 <section id="sales" class="hidden">
-<div class="card"><h2>Rekod Hasil Kebun Kelapa</h2>
+<div class="card">
+<h2>Rekod Hasil Kebun Kelapa</h2>
 <div id="salesForm" class="hidden">
 <form onsubmit="addSale(event)">
 <div class="formgrid">
 <div><label>Tarikh</label><input id="saleDate" type="date" required></div>
-<div><label>Jenis hasil kelapa</label><input id="product" required placeholder="Contoh: Kelapa tua"></div>
+<div><label>Jenis hasil</label><input id="product" placeholder="Contoh: Kelapa tua" required></div>
 <div><label>Kuantiti</label><input id="quantity" type="number" min="0" step="0.01" value="0"></div>
 <div><label>Wang diterima (RM)</label><input id="amount" type="number" min="0" step="0.01" required></div>
 </div>
-<label>Catatan</label><textarea id="notes" rows="2"></textarea>
+<label>Catatan</label>
+<textarea id="notes" rows="2"></textarea>
 <button type="submit">Simpan Rekod Hasil</button>
 </form>
 </div>
-<div id="salesPermission" class="small">Paparan awam sahaja. Admin boleh login untuk menguruskan rekod.</div>
+<div id="salesPermission" class="small">Admin perlu login untuk mengurus rekod.</div>
 </div>
-<div class="card"><h2>Jadual Hasil Kebun Kelapa</h2>
+
+<div class="card">
+<h2>Jadual Hasil Kebun Kelapa</h2>
 <button onclick="loadAll()">Muat Semula</button>
 <button class="secondary" onclick="downloadSalesPDF()">Muat Turun PDF Hasil Kebun</button>
-<div class="table-wrap" id="saleList">Memuatkan rekod...</div>
+<div class="table-wrap" id="saleList"></div>
 <div class="summary" id="salesGrandTotal">Jumlah wang diterima: RM 0.00</div>
 </div>
 </section>
 
 <section id="extra" class="hidden">
-<div class="card"><h2>Rekod Tambahan</h2>
+<div class="card">
+<h2>Rekod Tambahan</h2>
 <div id="extraAdmin" class="hidden">
-<p>Pilih nama bahagian yang mudah difahami. Contoh: Rekod Perbelanjaan, Rekod Baja, Rekod Minyak atau Rekod Penyelenggaraan.</p>
+<p>Pilih nama bahagian atau taip nama sendiri.</p>
 <form onsubmit="createSection(event)">
-<label>Nama rekod baharu</label>
-<div class="formgrid"><input id="sectionName" list="sectionSuggestions" required placeholder="Pilih atau taip nama rekod"><datalist id="sectionSuggestions"><option value="Rekod Perbelanjaan"><option value="Rekod Baja"><option value="Rekod Minyak"><option value="Rekod Penyelenggaraan"><option value="Rekod Pembelian"><option value="Rekod Lain-lain"></datalist><button type="submit">+ Tambah Rekod Baharu</button></div>
+<label>Nama bahagian rekod</label>
+<div class="formgrid">
+<input id="sectionName" list="sectionSuggestions" placeholder="Contoh: Rekod Perbelanjaan" required>
+<datalist id="sectionSuggestions">
+<option value="Rekod Perbelanjaan">
+<option value="Rekod Baja">
+<option value="Rekod Minyak">
+<option value="Rekod Penyelenggaraan">
+<option value="Rekod Pembelian">
+<option value="Rekod Lain-lain">
+</datalist>
+<button type="submit">+ Tambah Bahagian</button>
+</div>
 </form>
 </div>
-<div id="extraPermission" class="small">Paparan awam boleh melihat rekod tambahan. Admin boleh menambah, mengubah dan memadam rekod.</div>
+<div id="extraPermission" class="small">Admin perlu login untuk menambah atau mengubah rekod.</div>
 <div id="sectionList"></div>
 </div>
 </section>
-<footer class="small">Sistem Rekod Kerja & Hasil Kebun Kelapa</footer>
+
 </main>
 
 <script>
@@ -143,156 +204,351 @@ const SUPABASE_URL='https://maaoauxhhctjomvpluys.supabase.co';
 const SUPABASE_KEY='sb_publishable_jIY6auMJMaDP3AK0CL4Azw_pvd21aUT';
 const ADMIN_UID='7b104d3c-d773-49dc-8783-3f05210e95db';
 const dbClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let currentUser=null,isAdmin=false,workData=[],taskData=[],salesData=[],sectionsData=[],extraRecords=[],realtimeChannel=null,workGroups=[];
+
+let currentUser=null,isAdmin=false;
+let workData=[],taskData=[],salesData=[],sectionsData=[],extraRecords=[];
+let workGroups=[],realtimeChannel=null;
 
 const el=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const rm=n=>Number(n||0).toLocaleString('ms-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
-function status(text,type='status'){el('connection').className='status '+type;el('connection').textContent=text}
-function showPage(p){['home','login','work','sales','extra'].forEach(x=>el(x).classList.add('hidden'));el(p).classList.remove('hidden')}
+
+function status(msg,type='status'){
+ el('connection').className='status '+type;
+ el('connection').textContent=msg;
+}
+function showPage(p){
+ ['home','login','work','sales','extra'].forEach(x=>el(x).classList.add('hidden'));
+ el(p).classList.remove('hidden');
+}
 function updateAccess(){
- el('loginNav').classList.toggle('hidden',isAdmin);el('logoutNav').classList.toggle('hidden',!isAdmin);
+ el('loginNav').classList.toggle('hidden',isAdmin);
+ el('logoutNav').classList.toggle('hidden',!isAdmin);
  ['workForm','salesForm','extraAdmin'].forEach(x=>el(x).classList.toggle('hidden',!isAdmin));
  ['workPermission','salesPermission','extraPermission'].forEach(x=>el(x).classList.toggle('hidden',isAdmin));
 }
+
 async function login(e){
- e.preventDefault();el('loginMessage').textContent='Sedang login...';
- const {data,error}=await dbClient.auth.signInWithPassword({email:el('email').value.trim(),password:el('password').value});
+ e.preventDefault();
+ el('loginMessage').textContent='Sedang login...';
+ const {data,error}=await dbClient.auth.signInWithPassword({
+  email:el('email').value.trim(),
+  password:el('password').value
+ });
  if(error){el('loginMessage').textContent='Login gagal: '+error.message;return}
- if(data.user.id!==ADMIN_UID){await dbClient.auth.signOut();el('loginMessage').textContent='Akaun ini bukan admin yang dibenarkan.';return}
- currentUser=data.user;isAdmin=true;updateAccess();el('loginMessage').textContent='Login berjaya.';await loadAll();showPage('home');
+ if(data.user.id!==ADMIN_UID){
+  await dbClient.auth.signOut();
+  el('loginMessage').textContent='Akaun ini bukan admin yang dibenarkan.';
+  return;
+ }
+ currentUser=data.user;
+ isAdmin=true;
+ updateAccess();
+ await loadAll();
+ showPage('home');
 }
-async function logout(){await dbClient.auth.signOut();currentUser=null;isAdmin=false;updateAccess();await loadAll();status('Anda telah logout. Paparan awam sahaja.','success')}
+async function logout(){
+ await dbClient.auth.signOut();
+ currentUser=null;
+ isAdmin=false;
+ updateAccess();
+ await loadAll();
+ status('Anda telah logout.','success');
+}
 async function checkSession(){
- const {data,error}=await dbClient.auth.getSession();if(error)throw error;
- currentUser=data.session?.user||null;isAdmin=!!currentUser&&currentUser.id===ADMIN_UID;
- if(currentUser&&!isAdmin){await dbClient.auth.signOut();currentUser=null;isAdmin=false}
+ const {data,error}=await dbClient.auth.getSession();
+ if(error)throw error;
+ currentUser=data.session?.user||null;
+ isAdmin=!!currentUser&&currentUser.id===ADMIN_UID;
+ if(currentUser&&!isAdmin){
+  await dbClient.auth.signOut();
+  currentUser=null;
+  isAdmin=false;
+ }
  updateAccess();
 }
 
+/* REKOD KERJA */
 async function addWork(e){
- e.preventDefault();if(!isAdmin)return;
+ e.preventDefault();
+ if(!isAdmin)return;
  const taskNames=el('tasks').value.split('\n').map(x=>x.trim()).filter(Boolean);
  const {data,error}=await dbClient.from('work_records').insert({
-  project_name:el('project').value.trim(),work_date:el('workDate').value,
-  worker_name:el('worker').value.trim(),wage_amount:Number(el('wage').value)
+  project_name:el('project').value.trim(),
+  work_date:el('workDate').value,
+  worker_name:el('worker').value.trim(),
+  wage_amount:Number(el('wage').value)
  }).select().single();
- if(error){alert('Gagal simpan rekod: '+error.message);return}
+
+ if(error){alert('Gagal simpan: '+error.message);return}
+
  if(taskNames.length){
-  const {error:te}=await dbClient.from('work_tasks').insert(taskNames.map(task_name=>({work_record_id:data.id,task_name,is_completed:false})));
-  if(te)alert('Rekod pekerja disimpan tetapi tugasan gagal: '+te.message);
+  const {error:taskError}=await dbClient.from('work_tasks').insert(
+   taskNames.map(task_name=>({
+    work_record_id:data.id,
+    task_name,
+    is_completed:false
+   }))
+  );
+  if(taskError)alert('Rekod disimpan tetapi tugasan gagal: '+taskError.message);
  }
- e.target.reset();await loadAll();alert('Rekod kerja berjaya disimpan.');
+ e.target.reset();
+ await loadAll();
+ alert('Rekod kerja berjaya disimpan.');
 }
+
 async function editWork(id){
- if(!isAdmin)return;const r=workData.find(x=>x.id===id);if(!r)return;
- const date=prompt('Tarikh kerja (YYYY-MM-DD)',r.work_date);if(date===null)return;
- const place=prompt('Tempat kerja / projek',r.project_name);if(place===null)return;
- const worker=prompt('Nama pekerja',r.worker_name);if(worker===null)return;
- const wage=prompt('Gaji diambil (RM)',r.wage_amount??0);if(wage===null)return;
- if(!Number.isFinite(Number(wage))||Number(wage)<0){alert('Nilai gaji tidak sah.');return}
- const {error}=await dbClient.from('work_records').update({work_date:date,project_name:place.trim(),worker_name:worker.trim(),wage_amount:Number(wage)}).eq('id',id);
- if(error)alert(error.message);await loadAll();
+ if(!isAdmin)return;
+ const r=workData.find(x=>x.id===id);
+ if(!r)return;
+
+ const date=prompt('Tarikh kerja (YYYY-MM-DD)',r.work_date);
+ if(date===null)return;
+ const place=prompt('Tempat kerja',r.project_name);
+ if(place===null)return;
+ const worker=prompt('Nama pekerja',r.worker_name);
+ if(worker===null)return;
+ const wage=prompt('Gaji (RM)',r.wage_amount??0);
+ if(wage===null)return;
+
+ if(!Number.isFinite(Number(wage))||Number(wage)<0){
+  alert('Jumlah gaji tidak sah.');return;
+ }
+
+ const {error}=await dbClient.from('work_records').update({
+  work_date:date,
+  project_name:place.trim(),
+  worker_name:worker.trim(),
+  wage_amount:Number(wage)
+ }).eq('id',id);
+
+ if(error)alert(error.message);
+ await loadAll();
 }
+
 async function addTask(id){
- if(!isAdmin)return;const name=prompt('Masukkan tugasan baharu:');if(!name?.trim())return;
- const {error}=await dbClient.from('work_tasks').insert({work_record_id:id,task_name:name.trim(),is_completed:false});
- if(error)alert(error.message);await loadAll();
+ if(!isAdmin)return;
+ const name=prompt('Masukkan tugasan baharu:');
+ if(!name?.trim())return;
+ const {error}=await dbClient.from('work_tasks').insert({
+  work_record_id:id,task_name:name.trim(),is_completed:false
+ });
+ if(error)alert(error.message);
+ await loadAll();
 }
 async function editTask(id){
- if(!isAdmin)return;const t=taskData.find(x=>x.id===id);if(!t)return;
- const name=prompt('Ubah nama tugasan:',t.task_name);if(name===null)return;
+ if(!isAdmin)return;
+ const t=taskData.find(x=>x.id===id);
+ if(!t)return;
+ const name=prompt('Ubah nama tugasan:',t.task_name);
+ if(name===null)return;
  const {error}=await dbClient.from('work_tasks').update({task_name:name.trim()}).eq('id',id);
- if(error)alert(error.message);await loadAll();
+ if(error)alert(error.message);
+ await loadAll();
 }
 async function deleteTask(id){
  if(!isAdmin||!confirm('Padam tugasan ini?'))return;
- const {error}=await dbClient.from('work_tasks').delete().eq('id',id);if(error)alert(error.message);await loadAll();
+ const {error}=await dbClient.from('work_tasks').delete().eq('id',id);
+ if(error)alert(error.message);
+ await loadAll();
 }
 async function toggleTask(id,checked){
- if(!isAdmin)return;const {error}=await dbClient.from('work_tasks').update({is_completed:checked}).eq('id',id);
- if(error)alert(error.message);await loadAll();
+ if(!isAdmin)return;
+ const {error}=await dbClient.from('work_tasks').update({is_completed:checked}).eq('id',id);
+ if(error)alert(error.message);
+ await loadAll();
 }
 async function deleteWork(id){
- if(!isAdmin||!confirm('Padam rekod pekerja ini dan semua tugasan?'))return;
- const {error}=await dbClient.from('work_records').delete().eq('id',id);if(error)alert(error.message);await loadAll();
+ if(!isAdmin||!confirm('Padam rekod pekerja ini dan tugasan berkaitan?'))return;
+ const {error}=await dbClient.from('work_records').delete().eq('id',id);
+ if(error)alert(error.message);
+ await loadAll();
 }
+
 function monthKey(date){return String(date||'').slice(0,7)}
-function monthLabel(key){if(!key)return 'Bulan tidak diketahui';const [y,m]=key.split('-');const names=['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];return (names[Number(m)-1]||m)+' '+y}
+function monthLabel(key){
+ if(!key)return 'Bulan tidak diketahui';
+ const [y,m]=key.split('-');
+ const names=['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+ return (names[Number(m)-1]||m)+' '+y;
+}
+
+/* SATU KUMPULAN = BULAN + TEMPAT + NAMA PEKERJA */
 function makeWorkGroups(){
  const map=new Map();
+
  workData.forEach(r=>{
-  const month=monthKey(r.work_date),place=String(r.project_name||''),worker=String(r.worker_name||'');
-  const key=JSON.stringify([month,place,worker]);
-  if(!map.has(key))map.set(key,{month,place,worker,rows:[],subtotal:0});
-  const g=map.get(key);g.rows.push(r);g.subtotal+=Number(r.wage_amount||0);
+  const month=monthKey(r.work_date);
+  const place=String(r.project_name||'').trim();
+  const worker=String(r.worker_name||'').trim();
+
+  const key=JSON.stringify([month,place.toLowerCase(),worker.toLowerCase()]);
+
+  if(!map.has(key)){
+   map.set(key,{month,place,worker,rows:[],subtotal:0});
+  }
+  const group=map.get(key);
+  group.rows.push(r);
+  group.subtotal+=Number(r.wage_amount||0);
  });
- workGroups=[...map.values()].sort((a,b)=>b.month.localeCompare(a.month)||a.place.localeCompare(b.place)||a.worker.localeCompare(b.worker));
- workGroups.forEach(g=>g.rows.sort((a,b)=>a.work_date.localeCompare(b.work_date)||Number(a.id)-Number(b.id)));
+
+ workGroups=[...map.values()].sort((a,b)=>
+  b.month.localeCompare(a.month)||
+  a.place.localeCompare(b.place)||
+  a.worker.localeCompare(b.worker)
+ );
+
+ workGroups.forEach(g=>g.rows.sort((a,b)=>
+  a.work_date.localeCompare(b.work_date)||Number(a.id)-Number(b.id)
+ ));
  return workGroups;
 }
+
 function renderWork(){
- if(!workData.length){el('workList').innerHTML='<p>Belum ada rekod kerja.</p>';el('wageGrandTotal').textContent='Jumlah keseluruhan gaji: RM 0.00';workGroups=[];return}
- const groups=makeWorkGroups();let html='',grand=0;
+ if(!workData.length){
+  el('workList').innerHTML='<p>Belum ada rekod kerja.</p>';
+  el('wageGrandTotal').textContent='Jumlah keseluruhan gaji: RM 0.00';
+  workGroups=[];
+  return;
+ }
+
+ const groups=makeWorkGroups();
+ let html='',grand=0;
  const months=[...new Set(groups.map(g=>g.month))];
+
  months.forEach(month=>{
-  html+=`<h2 style="margin-top:24px">${esc(monthLabel(month))}</h2>`;
+  html+=`<h2 style="margin-top:25px">${esc(monthLabel(month))}</h2>`;
+
   groups.forEach((g,index)=>{
    if(g.month!==month)return;
    grand+=g.subtotal;
-   html+=`<h3>${esc(g.place)} — ${esc(g.worker)}</h3><div class="table-wrap"><table><thead><tr><th>Tarikh kerja</th><th>Tugasan</th><th>Gaji (RM)</th><th>Urusan</th></tr></thead><tbody>`;
+
+   html+=`<h3>${esc(g.place)} — ${esc(g.worker)}</h3>`;
+   html+='<div class="table-wrap"><table><thead><tr><th>Tarikh kerja</th><th>Tugasan</th><th>Gaji (RM)</th><th>Urusan</th></tr></thead><tbody>';
+
    g.rows.forEach(r=>{
     const tasks=taskData.filter(t=>t.work_record_id===r.id);
-    const taskHtml=tasks.length?tasks.map(t=>`<div class="taskline"><input type="checkbox" ${t.is_completed?'checked':''} ${isAdmin?'':'disabled'} onchange="toggleTask(${t.id},this.checked)"><span class="${t.is_completed?'done':''}">${esc(t.task_name)}</span>${isAdmin?`<button class="secondary" onclick="editTask(${t.id})">Edit tugas</button><button class="danger" onclick="deleteTask(${t.id})">Padam tugas</button>`:''}</div>`).join(''):'<span class="small">Tiada tugasan</span>';
-    html+=`<tr><td>${esc(r.work_date)}</td><td>${taskHtml}</td><td class="money">${rm(r.wage_amount)}</td><td class="actions">${isAdmin?`<button class="secondary" onclick="editWork(${r.id})">Edit rekod</button><button class="secondary" onclick="addTask(${r.id})">Tambah tugas</button><button class="danger" onclick="deleteWork(${r.id})">Padam</button>`:'-'}</td></tr>`;
+    const taskHtml=tasks.length?tasks.map(t=>
+     `<div class="taskline">
+      <input type="checkbox" ${t.is_completed?'checked':''} ${isAdmin?'':'disabled'} onchange="toggleTask(${t.id},this.checked)">
+      <span class="${t.is_completed?'done':''}">${esc(t.task_name)}</span>
+      ${isAdmin?`<button class="secondary" onclick="editTask(${t.id})">Edit tugas</button><button class="danger" onclick="deleteTask(${t.id})">Padam</button>`:''}
+     </div>`
+    ).join(''):'<span class="small">Tiada tugasan</span>';
+
+    html+=`<tr>
+     <td>${esc(r.work_date)}</td>
+     <td>${taskHtml}</td>
+     <td class="money">${rm(r.wage_amount)}</td>
+     <td>${isAdmin?`
+      <button class="secondary" onclick="editWork(${r.id})">Edit rekod</button>
+      <button class="secondary" onclick="addTask(${r.id})">Tambah tugas</button>
+      <button class="danger" onclick="deleteWork(${r.id})">Padam</button>`:'-'}</td>
+    </tr>`;
    });
-   html+=`</tbody><tfoot><tr><td colspan="2">Jumlah gaji ${esc(g.worker)} — ${esc(g.place)}</td><td class="money">RM ${rm(g.subtotal)}</td><td></td></tr></tfoot></table></div><button class="secondary" onclick="downloadWorkGroupPDF(${index})">Muat Turun PDF — ${esc(g.worker)} (${esc(g.place)})</button>`;
+
+   html+=`</tbody><tfoot><tr>
+    <td colspan="2">Jumlah gaji ${esc(g.worker)} — ${esc(g.place)}</td>
+    <td class="money">RM ${rm(g.subtotal)}</td><td></td>
+   </tr></tfoot></table></div>`;
+
+   html+=`<button class="secondary" onclick="downloadWorkGroupPDF(${index})">Muat Turun PDF — ${esc(g.worker)} (${esc(g.place)})</button>`;
   });
  });
- el('workList').innerHTML=html;el('wageGrandTotal').textContent='Jumlah keseluruhan gaji semua pekerja: RM '+rm(grand);
+
+ el('workList').innerHTML=html;
+ el('wageGrandTotal').textContent='Jumlah keseluruhan gaji semua pekerja: RM '+rm(grand);
 }
 
+/* REKOD HASIL KEBUN */
 async function addSale(e){
- e.preventDefault();if(!isAdmin)return;
+ e.preventDefault();
+ if(!isAdmin)return;
+
  const {error}=await dbClient.from('sales_records').insert({
-  sale_date:el('saleDate').value,product_name:el('product').value.trim(),
-  quantity:Number(el('quantity').value||0),amount:Number(el('amount').value),notes:el('notes').value.trim()
+  sale_date:el('saleDate').value,
+  product_name:el('product').value.trim(),
+  quantity:Number(el('quantity').value||0),
+  amount:Number(el('amount').value),
+  notes:el('notes').value.trim()
  });
  if(error){alert('Gagal simpan: '+error.message);return}
- e.target.reset();await loadAll();alert('Rekod hasil berjaya disimpan.');
-}
-async function editSale(id){
- if(!isAdmin)return;const r=salesData.find(x=>x.id===id);if(!r)return;
- const date=prompt('Tarikh (YYYY-MM-DD)',r.sale_date);if(date===null)return;
- const product=prompt('Jenis hasil kelapa',r.product_name);if(product===null)return;
- const quantity=prompt('Kuantiti',r.quantity??0);if(quantity===null)return;
- const amount=prompt('Wang diterima (RM)',r.amount);if(amount===null)return;
- const notes=prompt('Catatan',r.notes||'');if(notes===null)return;
- const {error}=await dbClient.from('sales_records').update({sale_date:date,product_name:product.trim(),quantity:Number(quantity),amount:Number(amount),notes:notes.trim()}).eq('id',id);
- if(error)alert(error.message);await loadAll();
-}
-async function deleteSale(id){
- if(!isAdmin||!confirm('Padam rekod hasil ini?'))return;
- const {error}=await dbClient.from('sales_records').delete().eq('id',id);if(error)alert(error.message);await loadAll();
-}
-function renderSales(){
- if(!salesData.length)el('saleList').innerHTML='<p>Belum ada rekod hasil kebun.</p>';
- else el('saleList').innerHTML=`<table><thead><tr><th>Tarikh</th><th>Jenis hasil</th><th>Kuantiti</th><th>Wang diterima</th><th>Catatan</th><th>Urusan</th></tr></thead><tbody>`+
- salesData.map(r=>`<tr><td>${esc(r.sale_date)}</td><td>${esc(r.product_name)}</td><td>${esc(r.quantity??0)}</td><td class="money">RM ${rm(r.amount)}</td><td>${esc(r.notes||'-')}</td><td class="actions">${isAdmin?`<button class="secondary" onclick="editSale(${r.id})">Edit</button><button class="danger" onclick="deleteSale(${r.id})">Padam</button>`:'-'}</td></tr>`).join('')+
- `</tbody></table>`;
- const total=salesData.reduce((a,r)=>a+Number(r.amount||0),0);el('salesGrandTotal').textContent='Jumlah wang diterima: RM '+rm(total);
+ e.target.reset();
+ await loadAll();
+ alert('Rekod hasil berjaya disimpan.');
 }
 
-/* REKOD TAMBAHAN: borang mudah dengan medan yang seragam */
-async function createSection(e){
- e.preventDefault();if(!isAdmin)return;
- const name=el('sectionName').value.trim();if(!name)return;
- const {error}=await dbClient.from('custom_sections').insert({name});
- if(error){alert('Gagal tambah rekod baharu: '+error.message);return}
- el('sectionName').value='';await loadAll();
+async function editSale(id){
+ if(!isAdmin)return;
+ const r=salesData.find(x=>x.id===id);
+ if(!r)return;
+
+ const date=prompt('Tarikh (YYYY-MM-DD)',r.sale_date);
+ if(date===null)return;
+ const product=prompt('Jenis hasil',r.product_name);
+ if(product===null)return;
+ const quantity=prompt('Kuantiti',r.quantity??0);
+ if(quantity===null)return;
+ const amount=prompt('Wang diterima (RM)',r.amount);
+ if(amount===null)return;
+ const notes=prompt('Catatan',r.notes||'');
+ if(notes===null)return;
+
+ const {error}=await dbClient.from('sales_records').update({
+  sale_date:date,
+  product_name:product.trim(),
+  quantity:Number(quantity),
+  amount:Number(amount),
+  notes:notes.trim()
+ }).eq('id',id);
+
+ if(error)alert(error.message);
+ await loadAll();
 }
+
+async function deleteSale(id){
+ if(!isAdmin||!confirm('Padam rekod hasil ini?'))return;
+ const {error}=await dbClient.from('sales_records').delete().eq('id',id);
+ if(error)alert(error.message);
+ await loadAll();
+}
+
+function renderSales(){
+ if(!salesData.length){
+  el('saleList').innerHTML='<p>Belum ada rekod hasil kebun.</p>';
+ }else{
+  el('saleList').innerHTML=`<table>
+   <thead><tr><th>Tarikh</th><th>Jenis hasil</th><th>Kuantiti</th><th>Wang diterima</th><th>Catatan</th><th>Urusan</th></tr></thead>
+   <tbody>${salesData.map(r=>`<tr>
+    <td>${esc(r.sale_date)}</td>
+    <td>${esc(r.product_name)}</td>
+    <td>${esc(r.quantity??0)}</td>
+    <td class="money">RM ${rm(r.amount)}</td>
+    <td>${esc(r.notes||'-')}</td>
+    <td>${isAdmin?`<button class="secondary" onclick="editSale(${r.id})">Edit</button><button class="danger" onclick="deleteSale(${r.id})">Padam</button>`:'-'}</td>
+   </tr>`).join('')}</tbody></table>`;
+ }
+ const total=salesData.reduce((a,r)=>a+Number(r.amount||0),0);
+ el('salesGrandTotal').textContent='Jumlah wang diterima: RM '+rm(total);
+}
+
+/* REKOD TAMBAHAN */
+async function createSection(e){
+ e.preventDefault();
+ if(!isAdmin)return;
+ const name=el('sectionName').value.trim();
+ if(!name)return;
+
+ const {error}=await dbClient.from('custom_sections').insert({name});
+ if(error){alert('Gagal tambah bahagian: '+error.message);return}
+ el('sectionName').value='';
+ await loadAll();
+}
+
 async function addExtraRecord(e,sectionId){
- e.preventDefault();if(!isAdmin)return;
+ e.preventDefault();
+ if(!isAdmin)return;
+
  const form=e.target;
  const payload={
   'Perkara':form.elements.perkara.value.trim(),
@@ -300,59 +556,125 @@ async function addExtraRecord(e,sectionId){
   'Jumlah (RM)':form.elements.jumlah.value===''?'':Number(form.elements.jumlah.value),
   'Catatan':form.elements.catatan.value.trim()
  };
- if(!payload['Perkara']){alert('Sila isi perkara atau keterangan rekod.');return}
- const {error}=await dbClient.from('custom_records').insert({section_id:sectionId,record_date:form.elements.tarikh.value,data:payload});
- if(error){alert('Gagal simpan rekod: '+error.message);return}
- await loadAll();alert('Rekod tambahan berjaya disimpan.');
+
+ if(!payload['Perkara']){
+  alert('Sila isi perkara atau keterangan.');
+  return;
+ }
+
+ const {error}=await dbClient.from('custom_records').insert({
+  section_id:sectionId,
+  record_date:form.elements.tarikh.value,
+  data:payload
+ });
+
+ if(error){alert('Gagal simpan: '+error.message);return}
+ await loadAll();
+ alert('Rekod tambahan berjaya disimpan.');
 }
+
 async function editExtraRecord(id){
- if(!isAdmin)return;const r=extraRecords.find(x=>x.id===id);if(!r)return;
+ if(!isAdmin)return;
+ const r=extraRecords.find(x=>x.id===id);
+ if(!r)return;
  const d=r.data||{};
- const date=prompt('Tarikh rekod (YYYY-MM-DD)',r.record_date);if(date===null)return;
- const perkara=prompt('Perkara / keterangan',d['Perkara']??Object.entries(d).map(([k,v])=>k+': '+v).join(', '));if(perkara===null)return;
- const kuantiti=prompt('Kuantiti (jika tiada, biarkan kosong)',d['Kuantiti']??'');if(kuantiti===null)return;
- const jumlah=prompt('Jumlah wang (RM) (jika tiada, biarkan kosong)',d['Jumlah (RM)']??'');if(jumlah===null)return;
- const catatan=prompt('Catatan',d['Catatan']??'');if(catatan===null)return;
- if(jumlah!==''&&(!Number.isFinite(Number(jumlah))||Number(jumlah)<0)){alert('Jumlah wang tidak sah.');return}
- const payload={'Perkara':perkara.trim(),'Kuantiti':kuantiti.trim(),'Jumlah (RM)':jumlah===''?'':Number(jumlah),'Catatan':catatan.trim()};
- const {error}=await dbClient.from('custom_records').update({record_date:date,data:payload}).eq('id',id);
- if(error)alert('Gagal mengubah rekod: '+error.message);await loadAll();
+
+ const date=prompt('Tarikh (YYYY-MM-DD)',r.record_date);
+ if(date===null)return;
+ const perkara=prompt('Perkara / keterangan',d['Perkara']||'');
+ if(perkara===null)return;
+ const kuantiti=prompt('Kuantiti',d['Kuantiti']||'');
+ if(kuantiti===null)return;
+ const jumlah=prompt('Jumlah wang (RM)',d['Jumlah (RM)']??'');
+ if(jumlah===null)return;
+ const catatan=prompt('Catatan',d['Catatan']||'');
+ if(catatan===null)return;
+
+ if(jumlah!==''&&(!Number.isFinite(Number(jumlah))||Number(jumlah)<0)){
+  alert('Jumlah wang tidak sah.');return;
+ }
+
+ const payload={
+  'Perkara':perkara.trim(),
+  'Kuantiti':kuantiti.trim(),
+  'Jumlah (RM)':jumlah===''?'':Number(jumlah),
+  'Catatan':catatan.trim()
+ };
+
+ const {error}=await dbClient.from('custom_records').update({
+  record_date:date,data:payload
+ }).eq('id',id);
+
+ if(error)alert('Gagal mengubah rekod: '+error.message);
+ await loadAll();
 }
+
 async function deleteExtraRecord(id){
  if(!isAdmin||!confirm('Padam rekod tambahan ini?'))return;
- const {error}=await dbClient.from('custom_records').delete().eq('id',id);if(error)alert(error.message);await loadAll();
+ const {error}=await dbClient.from('custom_records').delete().eq('id',id);
+ if(error)alert(error.message);
+ await loadAll();
 }
+
 async function deleteSection(id){
- if(!isAdmin||!confirm('Padam bahagian ini berserta semua rekodnya?'))return;
- const {error}=await dbClient.from('custom_sections').delete().eq('id',id);if(error)alert(error.message);await loadAll();
+ if(!isAdmin||!confirm('Padam bahagian ini bersama semua rekodnya?'))return;
+ const {error}=await dbClient.from('custom_sections').delete().eq('id',id);
+ if(error)alert(error.message);
+ await loadAll();
 }
+
 function renderSections(){
- if(!sectionsData.length){el('sectionList').innerHTML='<p>Belum ada rekod tambahan. Admin boleh menambah bahagian rekod di atas.</p>';return}
+ if(!sectionsData.length){
+  el('sectionList').innerHTML='<p>Belum ada bahagian rekod tambahan.</p>';
+  return;
+ }
+
  const today=new Date().toISOString().slice(0,10);
+
  el('sectionList').innerHTML=sectionsData.map(s=>{
   const rows=extraRecords.filter(r=>r.section_id===s.id);
   const total=rows.reduce((sum,r)=>sum+Number(r.data?.['Jumlah (RM)']||0),0);
-  return `<div class="card"><h3>${esc(s.name)}</h3>
-   ${isAdmin?`<form class="card" style="background:#f7faf8;border:1px solid var(--line)" onsubmit="addExtraRecord(event,${s.id})">
+
+  return `<div class="card">
+   <h3>${esc(s.name)}</h3>
+
+   ${isAdmin?`<form class="card" style="background:#f7faf8" onsubmit="addExtraRecord(event,${s.id})">
     <h3>Tambah rekod: ${esc(s.name)}</h3>
     <div class="formgrid">
      <div><label>Tarikh</label><input name="tarikh" type="date" value="${today}" required></div>
-     <div><label>Perkara / Keterangan</label><input name="perkara" placeholder="Contoh: Beli baja atau minyak" required></div>
-     <div><label>Kuantiti (jika ada)</label><input name="kuantiti" placeholder="Contoh: 2 beg / 10 liter"></div>
+     <div><label>Perkara / Keterangan</label><input name="perkara" placeholder="Contoh: Beli baja" required></div>
+     <div><label>Kuantiti (jika ada)</label><input name="kuantiti" placeholder="Contoh: 2 beg"></div>
      <div><label>Jumlah wang (RM)</label><input name="jumlah" type="number" min="0" step="0.01" placeholder="0.00"></div>
     </div>
-    <label>Catatan</label><input name="catatan" placeholder="Contoh: Dibayar tunai / nombor resit">
+    <label>Catatan</label>
+    <input name="catatan" placeholder="Catatan tambahan">
     <button type="submit">Simpan Rekod</button>
-   </form><button class="danger" onclick="deleteSection(${s.id})">Padam Bahagian</button>`:''}
-   ${rows.length?`<div class="table-wrap"><table><thead><tr><th>Tarikh</th><th>Perkara / Keterangan</th><th>Kuantiti</th><th>Jumlah (RM)</th><th>Catatan</th><th>Urusan</th></tr></thead><tbody>${rows.map(r=>{
-    const d=r.data||{};const legacy=Object.entries(d).filter(([k])=>!['Perkara','Kuantiti','Jumlah (RM)','Catatan'].includes(k)).map(([k,v])=>k+': '+v).join(' | ');
-    return `<tr><td>${esc(r.record_date)}</td><td>${esc(d['Perkara']||legacy||'-')}</td><td>${esc(d['Kuantiti']??'-')}</td><td class="money">${d['Jumlah (RM)']!==undefined&&d['Jumlah (RM)']!==''?'RM '+rm(d['Jumlah (RM)']):'-'}</td><td>${esc(d['Catatan']||'-')}</td><td class="actions">${isAdmin?`<button class="secondary" onclick="editExtraRecord(${r.id})">Edit</button><button class="danger" onclick="deleteExtraRecord(${r.id})">Padam</button>`:'-'}</td></tr>`;
-   }).join('')}</tbody><tfoot><tr><td colspan="3">Jumlah keseluruhan</td><td class="money">RM ${rm(total)}</td><td colspan="2"></td></tr></tfoot></table></div>`:'<p class="small">Belum ada rekod. Gunakan borang di atas untuk menambah rekod.</p>'}
+   </form>
+   <button class="danger" onclick="deleteSection(${s.id})">Padam Bahagian</button>`:''}
+
+   ${rows.length?`<div class="table-wrap"><table>
+    <thead><tr><th>Tarikh</th><th>Perkara</th><th>Kuantiti</th><th>Jumlah (RM)</th><th>Catatan</th><th>Urusan</th></tr></thead>
+    <tbody>${rows.map(r=>{
+     const d=r.data||{};
+     return `<tr>
+      <td>${esc(r.record_date)}</td>
+      <td>${esc(d['Perkara']||'-')}</td>
+      <td>${esc(d['Kuantiti']||'-')}</td>
+      <td class="money">${d['Jumlah (RM)']!==undefined&&d['Jumlah (RM)']!==''?'RM '+rm(d['Jumlah (RM)']):'-'}</td>
+      <td>${esc(d['Catatan']||'-')}</td>
+      <td>${isAdmin?`<button class="secondary" onclick="editExtraRecord(${r.id})">Edit</button><button class="danger" onclick="deleteExtraRecord(${r.id})">Padam</button>`:'-'}</td>
+     </tr>`;
+    }).join('')}</tbody>
+    <tfoot><tr><td colspan="3">Jumlah keseluruhan</td><td class="money">RM ${rm(total)}</td><td colspan="2"></td></tr></tfoot>
+   </table></div>`:'<p class="small">Belum ada rekod. Gunakan borang di atas untuk menambah rekod.</p>'}
   </div>`;
  }).join('');
 }
+
+/* MUAT SEMUA DATA */
 async function loadAll(){
  status('Sedang memuatkan rekod...');
+
  const results=await Promise.all([
   dbClient.from('work_records').select('*').order('work_date',{ascending:false}),
   dbClient.from('work_tasks').select('*').order('id'),
@@ -360,14 +682,25 @@ async function loadAll(){
   dbClient.from('custom_sections').select('*').order('created_at'),
   dbClient.from('custom_records').select('*').order('record_date',{ascending:false})
  ]);
+
  const bad=results.find(x=>x.error);
- if(bad){status('Ralat pangkalan data: '+bad.error.message,'error');return}
+ if(bad){
+  status('Ralat pangkalan data: '+bad.error.message,'error');
+  return;
+ }
+
  [workData,taskData,salesData,sectionsData,extraRecords]=results.map(x=>x.data||[]);
- renderWork();renderSales();renderSections();status('Sambungan pangkalan data berjaya. Data telah dikemas kini.','success');
+
+ renderWork();
+ renderSales();
+ renderSections();
+ status('Sambungan berjaya. Rekod telah dikemas kini.','success');
 }
+
 function startRealtime(){
  if(realtimeChannel)dbClient.removeChannel(realtimeChannel);
- realtimeChannel=dbClient.channel('rekod-realtime-v2')
+
+ realtimeChannel=dbClient.channel('rekod-realtime')
  .on('postgres_changes',{event:'*',schema:'public',table:'work_records'},()=>loadAll())
  .on('postgres_changes',{event:'*',schema:'public',table:'work_tasks'},()=>loadAll())
  .on('postgres_changes',{event:'*',schema:'public',table:'sales_records'},()=>loadAll())
@@ -375,51 +708,129 @@ function startRealtime(){
  .on('postgres_changes',{event:'*',schema:'public',table:'custom_records'},()=>loadAll())
  .subscribe();
 }
+
+/* PDF REKOD KERJA: SATU PDF BAGI SATU NAMA + TEMPAT + BULAN */
 function downloadWorkGroupPDF(groupIndex){
- if(!window.jspdf)return alert('PDF belum dimuatkan.');
- const g=workGroups[groupIndex];if(!g)return alert('Jadual tidak ditemui. Sila muat semula.');
- const {jsPDF}=window.jspdf,doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
- const pageW=doc.internal.pageSize.getWidth(),left=14,right=pageW-14;let y=17;
- const safeName=v=>String(v||'').normalize('NFKD').replace(/[^a-zA-Z0-9_-]+/g,'-').replace(/^-|-$/g,'').slice(0,45)||'rekod';
- doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text('REKOD KERJA PEKERJA',left,y);y+=8;
- doc.setFont('helvetica','normal');doc.setFontSize(10);doc.text('Bulan: '+monthLabel(g.month),left,y);y+=6;doc.text('Tempat kerja: '+g.place,left,y);y+=6;doc.text('Nama pekerja: '+g.worker,left,y);y+=9;
- const x=[left,43,145,right],rowH=8;
+ if(!window.jspdf){alert('PDF belum dimuatkan.');return}
+ const g=workGroups[groupIndex];
+ if(!g){alert('Jadual tidak ditemui. Sila muat semula.');return}
+
+ const {jsPDF}=window.jspdf;
+ const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+ const left=14,right=196;
+ let y=17;
+
+ const safeName=v=>String(v||'').normalize('NFKD').replace(/[^a-zA-Z0-9_-]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'rekod';
+
+ doc.setFont('helvetica','bold');
+ doc.setFontSize(15);
+ doc.text('REKOD KERJA PEKERJA',left,y);
+ y+=9;
+
+ doc.setFont('helvetica','normal');
+ doc.setFontSize(10);
+ doc.text('Bulan: '+monthLabel(g.month),left,y);y+=6;
+ doc.text('Tempat kerja: '+g.place,left,y);y+=6;
+ doc.text('Nama pekerja: '+g.worker,left,y);y+=9;
+
+ const widths=[29,125,28];
+ const xs=[left,left+widths[0],left+widths[0]+widths[1],left+widths[0]+widths[1]+widths[2]];
+
  function drawRow(cells,header=false){
-  const heights=cells.map((v,i)=>doc.splitTextToSize(String(v??''),x[i+1]-x[i]-4).length);
-  const h=Math.max(rowH,...heights.map(n=>n*4.5+3));
-  if(y+h>280){doc.addPage();y=17;}
-  for(let i=0;i<3;i++){doc.setDrawColor(170);doc.rect(x[i],y,x[i+1]-x[i],h);}
-  if(header){doc.setFillColor(232,242,236);doc.rect(left,y,right-left,h,'F');for(let i=0;i<3;i++)doc.rect(x[i],y,x[i+1]-x[i],h);doc.setFont('helvetica','bold');}
-  else doc.setFont('helvetica','normal');
+  const lines=cells.map((v,i)=>doc.splitTextToSize(String(v??''),widths[i]-4));
+  const height=Math.max(8,...lines.map(a=>a.length*4.5+3));
+
+  if(y+height>278){
+   doc.addPage();
+   y=17;
+  }
+
+  if(header){
+   doc.setFillColor(232,242,236);
+   doc.rect(left,y,right-left,height,'F');
+   doc.setFont('helvetica','bold');
+  }else{
+   doc.setFont('helvetica','normal');
+  }
+
+  doc.setDrawColor(160);
+  for(let i=0;i<3;i++)doc.rect(xs[i],y,widths[i],height);
+
   doc.setFontSize(8);
-  cells.forEach((v,i)=>{const lines=doc.splitTextToSize(String(v??''),x[i+1]-x[i]-4);doc.text(lines,x[i]+2,y+5);});
-  y+=h;
+  lines.forEach((line,i)=>{
+   doc.text(line,xs[i]+2,y+5);
+  });
+  y+=height;
  }
+
  drawRow(['Tarikh','Tugasan','Gaji (RM)'],true);
+
  g.rows.forEach(r=>{
-  const tasks=taskData.filter(t=>t.work_record_id===r.id).map(t=>(t.is_completed?'[Selesai] ':'[Belum selesai] ')+t.task_name).join('\n')||'Tiada tugasan';
+  const tasks=taskData.filter(t=>t.work_record_id===r.id)
+   .map(t=>(t.is_completed?'[Selesai] ':'[Belum selesai] ')+t.task_name)
+   .join('\n')||'Tiada tugasan';
+
   drawRow([r.work_date,tasks,rm(r.wage_amount)]);
  });
- y+=5;if(y>275){doc.addPage();y=17;}
- doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text('JUMLAH GAJI: RM '+rm(g.subtotal),right,y,{align:'right'});
+
+ y+=6;
+ if(y>275){doc.addPage();y=17}
+
+ doc.setFont('helvetica','bold');
+ doc.setFontSize(11);
+ doc.text('JUMLAH GAJI: RM '+rm(g.subtotal),right,y,{align:'right'});
+
  doc.save('rekod-'+safeName(g.worker)+'-'+safeName(g.place)+'-'+g.month+'.pdf');
 }
 
 function downloadSalesPDF(){
- if(!window.jspdf)return alert('PDF belum dimuatkan.');
- const {jsPDF}=window.jspdf,doc=new jsPDF();let y=16;doc.setFontSize(15);doc.text('REKOD HASIL KEBUN KELAPA',14,y);y+=12;doc.setFontSize(9);
- salesData.forEach(r=>{const line=`${r.sale_date} | ${r.product_name} | Kuantiti: ${r.quantity??0} | RM ${rm(r.amount)} | ${r.notes||''}`;const a=doc.splitTextToSize(line,180);if(y+a.length*5>280){doc.addPage();y=15}doc.text(a,14,y);y+=a.length*5+3});
- doc.text('Jumlah wang diterima: RM '+rm(salesData.reduce((a,r)=>a+Number(r.amount||0),0)),14,y+5);doc.save('hasil-kebun-kelapa.pdf');
-}
-async function startApp(){
- try{await checkSession();await loadAll();startRealtime();
- dbClient.auth.onAuthStateChange((event,session)=>{
-  currentUser=session?.user||null;isAdmin=!!currentUser&&currentUser.id===ADMIN_UID;
-  updateAccess();loadAll();
+ if(!window.jspdf){alert('PDF belum dimuatkan.');return}
+ const {jsPDF}=window.jspdf;
+ const doc=new jsPDF();
+ let y=17;
+
+ doc.setFont('helvetica','bold');
+ doc.setFontSize(15);
+ doc.text('REKOD HASIL KEBUN KELAPA',14,y);
+ y+=12;
+
+ doc.setFontSize(9);
+ doc.setFont('helvetica','normal');
+
+ salesData.forEach(r=>{
+  const line=`${r.sale_date} | ${r.product_name} | Kuantiti: ${r.quantity??0} | RM ${rm(r.amount)} | ${r.notes||''}`;
+  const lines=doc.splitTextToSize(line,180);
+  if(y+lines.length*5>280){doc.addPage();y=17}
+  doc.text(lines,14,y);
+  y+=lines.length*5+3;
  });
- }catch(e){status('Ralat sambungan: '+e.message,'error')}
+
+ y+=5;
+ doc.setFont('helvetica','bold');
+ doc.text('Jumlah wang diterima: RM '+rm(salesData.reduce((a,r)=>a+Number(r.amount||0),0)),14,y);
+ doc.save('hasil-kebun-kelapa.pdf');
 }
-updateAccess();startApp();
+
+/* MULA SISTEM */
+async function startApp(){
+ try{
+  await checkSession();
+  await loadAll();
+  startRealtime();
+
+  dbClient.auth.onAuthStateChange((event,session)=>{
+   currentUser=session?.user||null;
+   isAdmin=!!currentUser&&currentUser.id===ADMIN_UID;
+   updateAccess();
+   loadAll();
+  });
+ }catch(e){
+  status('Ralat sambungan: '+e.message,'error');
+ }
+}
+
+updateAccess();
+startApp();
 </script>
 </body>
 </html>
