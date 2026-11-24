@@ -171,7 +171,7 @@ const SUPABASE_URL = 'https://maaoauxhhctjomvpluys.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_jIY6auMJMaDP3AK0CL4Azw_pvd21aUT';
 const ADMIN_UID = '7b104d3c-d773-49dc-8783-3f05210e95db';
 
-const supabase = window.supabase.createClient(
+const dbClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
@@ -228,7 +228,7 @@ async function login(event){
   const email=el('email').value.trim();
   const password=el('password').value;
 
-  const {data,error}=await supabase.auth.signInWithPassword({
+  const {data,error}=await dbClient.auth.signInWithPassword({
     email,
     password
   });
@@ -239,7 +239,7 @@ async function login(event){
   }
 
   if(data.user.id !== ADMIN_UID){
-    await supabase.auth.signOut();
+    await dbClient.auth.signOut();
     currentUser=null;
     isAdmin=false;
     updateAccess();
@@ -257,7 +257,7 @@ async function login(event){
 }
 
 async function logout(){
-  await supabase.auth.signOut();
+  await dbClient.auth.signOut();
   currentUser=null;
   isAdmin=false;
   updateAccess();
@@ -266,14 +266,14 @@ async function logout(){
 }
 
 async function checkSession(){
-  const {data}=await supabase.auth.getSession();
+  const {data}=await dbClient.auth.getSession();
   const user=data.session?.user || null;
 
   currentUser=user;
   isAdmin=!!user && user.id===ADMIN_UID;
 
   if(user && !isAdmin){
-    await supabase.auth.signOut();
+    await dbClient.auth.signOut();
     currentUser=null;
     isAdmin=false;
   }
@@ -294,7 +294,7 @@ async function addWork(event){
 
   if(!tasks.length)return alert('Masukkan sekurang-kurangnya satu tugas.');
 
-  const {data:work,error}=await supabase
+  const {data:work,error}=await dbClient
     .from('work_records')
     .insert({
       project_name:project,
@@ -315,7 +315,7 @@ async function addWork(event){
     is_completed:false
   }));
 
-  const {error:taskError}=await supabase
+  const {error:taskError}=await dbClient
     .from('work_tasks').insert(taskRows);
 
   if(taskError){
@@ -334,7 +334,7 @@ async function addWork(event){
 async function toggleTask(id,checked){
   if(!isAdmin)return;
 
-  const {error}=await supabase
+  const {error}=await dbClient
     .from('work_tasks')
     .update({is_completed:checked})
     .eq('id',id);
@@ -357,7 +357,7 @@ async function editWork(id){
   const worker=prompt('Nama pekerja:',item.worker_name);
   if(worker===null)return;
 
-  const {error}=await supabase.from('work_records')
+  const {error}=await dbClient.from('work_records')
     .update({
       project_name:project.trim(),
       work_date:date,
@@ -371,7 +371,7 @@ async function editWork(id){
 async function deleteWork(id){
   if(!isAdmin || !confirm('Padam rekod kerja ini dan semua tugasnya?'))return;
 
-  const {error}=await supabase.from('work_records')
+  const {error}=await dbClient.from('work_records')
     .delete().eq('id',id);
 
   if(error)alert(error.message);
@@ -390,7 +390,7 @@ async function addSale(event){
     notes:el('notes').value.trim()
   };
 
-  const {error}=await supabase.from('sales_records').insert(record);
+  const {error}=await dbClient.from('sales_records').insert(record);
 
   if(error){
     alert('Gagal menyimpan jualan: '+error.message);
@@ -422,7 +422,7 @@ async function editSale(id){
   const notes=prompt('Catatan:',item.notes||'');
   if(notes===null)return;
 
-  const {error}=await supabase.from('sales_records')
+  const {error}=await dbClient.from('sales_records')
     .update({
       sale_date:date,
       product_name:product.trim(),
@@ -437,7 +437,7 @@ async function editSale(id){
 async function deleteSale(id){
   if(!isAdmin || !confirm('Padam rekod jualan ini?'))return;
 
-  const {error}=await supabase.from('sales_records')
+  const {error}=await dbClient.from('sales_records')
     .delete().eq('id',id);
 
   if(error)alert(error.message);
@@ -449,9 +449,9 @@ async function loadAll(){
   message('Sedang memuatkan rekod...');
 
   const [w,t,s]=await Promise.all([
-    supabase.from('work_records').select('*').order('work_date',{ascending:false}),
-    supabase.from('work_tasks').select('*').order('id'),
-    supabase.from('sales_records').select('*').order('sale_date',{ascending:false})
+    dbClient.from('work_records').select('*').order('work_date',{ascending:false}),
+    dbClient.from('work_tasks').select('*').order('id'),
+    dbClient.from('sales_records').select('*').order('sale_date',{ascending:false})
   ]);
 
   if(w.error || t.error || s.error){
@@ -627,10 +627,10 @@ function downloadSalesPDF(){
 /* REALTIME */
 function startRealtime(){
   if(realtimeChannel){
-    supabase.removeChannel(realtimeChannel);
+    dbClient.removeChannel(realtimeChannel);
   }
 
-  realtimeChannel=supabase.channel('rekod-online')
+  realtimeChannel=dbClient.channel('rekod-online')
     .on('postgres_changes',{
       event:'*',schema:'public',table:'work_records'
     },()=>loadAll())
@@ -654,13 +654,13 @@ async function startApp(){
     await loadAll();
     startRealtime();
 
-    supabase.auth.onAuthStateChange(async(event,session)=>{
+    dbClient.auth.onAuthStateChange(async(event,session)=>{
       const user=session?.user || null;
       currentUser=user;
       isAdmin=!!user && user.id===ADMIN_UID;
 
       if(user && !isAdmin){
-        await supabase.auth.signOut();
+        await dbClient.auth.signOut();
         currentUser=null;
         isAdmin=false;
       }
