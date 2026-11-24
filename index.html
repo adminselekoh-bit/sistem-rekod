@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sistem Rekod Kerja & Jualan</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;margin:0;background:#f3f6fa;color:#243247}
+header{background:#174b39;color:white;padding:24px;text-align:center}
+main{max-width:1000px;margin:25px auto;padding:15px}
+nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+button{border:0;border-radius:8px;padding:11px 16px;background:#176b50;color:white;cursor:pointer}
+button.secondary{background:#526579}
+button.danger{background:#b63838}
+.card{background:white;padding:20px;border-radius:12px;margin-bottom:18px;box-shadow:0 2px 10px #0001}
+input,textarea{width:100%;padding:11px;margin:6px 0 13px;border:1px solid #ccd4dc;border-radius:7px}
+label{font-weight:bold}
+h2{color:#174b39}
+.hidden{display:none}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid #ddd;text-align:left}
+.small{color:#657386;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<h1>Sistem Rekod Kerja & Jualan</h1>
+<p>Pengurusan rekod kontraktor dan hasil kebun</p>
+</header>
+<main>
+<nav>
+<button onclick="showPage('home')">Laman Utama</button>
+<button onclick="showPage('work')">Rekod Kerja Kontraktor</button>
+<button onclick="showPage('sales')">Rekod Jualan Kebun</button>
+</nav>
+
+<section id="home" class="card">
+<h2>Selamat Datang</h2>
+<p>Sila pilih bahagian rekod yang ingin dibuka.</p>
+<button onclick="showPage('work')">Buka Rekod Kerja</button>
+<button onclick="showPage('sales')">Buka Rekod Jualan Kebun</button>
+</section>
+
+<section id="work" class="hidden">
+<div class="card">
+<h2>Rekod Kerja Kontraktor</h2>
+<label>Nama projek / lokasi kerja</label>
+<input id="project" placeholder="Contoh: Projek rumah di Selekoh">
+<label>Tarikh kerja</label>
+<input id="workDate" type="date">
+<label>Nama pekerja</label>
+<input id="worker" placeholder="Nama pekerja">
+<label>Senarai tugas kerja</label>
+<textarea id="tasks" rows="3" placeholder="Contoh: Pasang paip, mengecat, memasang pintu"></textarea>
+<button onclick="addWork()">Simpan Rekod Kerja</button>
+</div>
+<div class="card">
+<h2>Senarai Rekod Kerja</h2>
+<div id="workList">Belum ada rekod.</div>
+<button onclick="printSection('workList')">Cetak / Simpan PDF</button>
+</div>
+</section>
+
+<section id="sales" class="hidden">
+<div class="card">
+<h2>Rekod Jualan Kebun</h2>
+<label>Tarikh jualan</label>
+<input id="saleDate" type="date">
+<label>Nama hasil / produk</label>
+<input id="product" placeholder="Contoh: Kelapa">
+<label>Jumlah wang diterima (RM)</label>
+<input id="amount" type="number" min="0" step="0.01" placeholder="Contoh: 250">
+<label>Catatan (pilihan)</label>
+<textarea id="notes" rows="2" placeholder="Catatan tambahan"></textarea>
+<button onclick="addSale()">Simpan Jualan</button>
+</div>
+<div class="card">
+<h2>Senarai Jualan Kebun</h2>
+<div id="saleList">Belum ada jualan.</div>
+<h3>Jumlah keseluruhan: RM <span id="total">0.00</span></h3>
+<button onclick="printSection('saleList')">Cetak / Simpan PDF</button>
+</div>
+</section>
+<p class="small">Versi paparan awal. Sambungan pangkalan data dan keselamatan admin akan dibuat dalam langkah seterusnya.</p>
+</main>
+<script>
+let works=[];
+let sales=[];
+
+function showPage(page){
+ document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+ document.getElementById(page).classList.remove('hidden');
+}
+function addWork(){
+ const project=document.getElementById('project').value.trim();
+ const date=document.getElementById('workDate').value;
+ const worker=document.getElementById('worker').value.trim();
+ const tasks=document.getElementById('tasks').value.trim();
+ if(!project||!date||!worker||!tasks){alert('Sila lengkapkan semua ruangan wajib.');return;}
+ works.push({project,date,worker,tasks});
+ document.getElementById('workList').innerHTML=works.map((w,i)=>
+ `<p><b>${i+1}. ${safe(w.project)}</b><br>Tarikh: ${safe(w.date)}<br>Pekerja: ${safe(w.worker)}<br>Tugas: ${safe(w.tasks)}</p><hr>`
+ ).join('');
+}
+function addSale(){
+ const date=document.getElementById('saleDate').value;
+ const product=document.getElementById('product').value.trim();
+ const amount=Number(document.getElementById('amount').value);
+ const notes=document.getElementById('notes').value.trim();
+ if(!date||!product||!Number.isFinite(amount)||amount<=0){alert('Sila masukkan tarikh, produk dan jumlah wang yang sah.');return;}
+ sales.push({date,product,amount,notes});
+ document.getElementById('saleList').innerHTML=sales.map((s,i)=>
+ `<p><b>${i+1}. ${safe(s.product)}</b><br>Tarikh: ${safe(s.date)}<br>Jumlah: RM ${s.amount.toFixed(2)}<br>${safe(s.notes)}</p><hr>`
+ ).join('');
+ document.getElementById('total').textContent=sales.reduce((sum,s)=>sum+s.amount,0).toFixed(2);
+}
+function safe(value){
+ return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function printSection(id){
+ const content=document.getElementById(id).innerHTML;
+ const w=window.open('','_blank');
+ w.document.write('<html><head><title>Laporan Rekod</title></head><body>'+content+'</body></html>');
+ w.document.close();w.print();
+}
+</script>
+</body>
+</html>
