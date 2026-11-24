@@ -93,9 +93,8 @@ tfoot td{font-weight:bold;background:#f3f8f4}
 <body>
 <header>
  <div class="header-inner">
-  <div class="eyebrow">✦ SISTEM PENGURUSAN KEBUN</div>
-  <h1>Sistem Rekod Kerja<br>& Hasil Kebun Kelapa</h1>
-  <p>Rekod tersusun • Mudah dipantau • Dikemas kini secara online</p>
+  <h1>SISTEM REKOD KERJA</h1>
+  <p>Rekod tersusun, mudah dipantau dan dikemas kini secara online</p>
  </div>
 </header>
 
@@ -681,8 +680,68 @@ function downloadExtraGroupPDF(index){
 
 /* WAKTU SOLAT: DATA JAKIM MELALUI SOLAT.MY */
 const SOLAT_API='https://solat.my/api';
-let prayerZoneCode='',prayerTimes=[],prayerTick=null;
+let prayerZoneCode='',prayerTimes=[],prayerTick=null,prayerLocations=[];
 const prayerNames=[['imsak','Imsak'],['fajr','Subuh'],['syuruk','Syuruk'],['dhuha','Duha'],['dhuhr','Zohor'],['asr','Asar'],['maghrib','Maghrib'],['isha','Isyak']];
+
+const FALLBACK_ZONES=[
+ ['JHR01','Pulau Aur dan Pulau Pemanggil'],
+ ['JHR02','Johor Bahru, Kota Tinggi, Mersing, Kulai'],
+ ['JHR03','Kluang, Pontian'],
+ ['JHR04','Batu Pahat, Muar, Segamat, Gemas Johor, Tangkak'],
+ ['KDH01','Kota Setar, Kubang Pasu, Pokok Sena'],
+ ['KDH02','Kuala Muda, Yan, Pendang'],
+ ['KDH03','Padang Terap, Sik'],
+ ['KDH04','Baling'],
+ ['KDH05','Bandar Baharu, Kulim'],
+ ['KDH06','Langkawi'],
+ ['KDH07','Puncak Gunung Jerai'],
+ ['KTN01','Kota Bharu, Bachok, Pasir Puteh, Tumpat, Pasir Mas, Tanah Merah, Machang, Kuala Krai, Mukim Chiku'],
+ ['KTN02','Gua Musang, Jeli, Jajahan Kecil Lojing'],
+ ['MLK01','Seluruh Melaka'],
+ ['NGS01','Tampin, Jempol'],
+ ['NGS02','Port Dickson, Seremban, Kuala Pilah, Jelebu, Rembau'],
+ ['PHG01','Pulau Tioman'],
+ ['PHG02','Kuantan, Pekan, Rompin, Muadzam Shah'],
+ ['PHG03','Maran, Chenor, Temerloh, Bera, Jerantut'],
+ ['PHG04','Bentong, Raub, Kuala Lipis'],
+ ['PHG05','Genting Sempah, Janda Baik, Bukit Tinggi'],
+ ['PHG06','Cameron Highlands, Genting Highlands, Bukit Fraser'],
+ ['PHG07','Zon Pahang lain'],
+ ['PRK01','Tapah, Slim River, Tanjung Malim'],
+ ['PRK02','Ipoh, Batu Gajah, Kampar, Sg Siput, Kuala Kangsar'],
+ ['PRK03','Pengkalan Hulu, Grik'],
+ ['PRK04','Temengor, Belum'],
+ ['PRK05','Teluk Intan, Bagan Datuk, Kampung Gajah, Seri Iskandar, Beruas, Parit, Lumut, Sitiawan'],
+ ['PRK06','Selama, Taiping, Bagan Serai, Parit Buntar'],
+ ['PRK07','Bukit Larut'],
+ ['PLS01','Kangar, Padang Besar, Arau'],
+ ['PNG01','Seluruh Pulau Pinang'],
+ ['SBH01','Bahagian Sandakan Timur'],
+ ['SBH02','Bahagian Sandakan Barat'],
+ ['SBH03','Bahagian Tawau, Lahad Datu, Semporna'],
+ ['SBH04','Bahagian Kudat'],
+ ['SBH05','Bahagian Pantai Barat'],
+ ['SBH06','Bahagian Pedalaman Atas'],
+ ['SBH07','Bahagian Pedalaman Bawah'],
+ ['SGR01','Gombak, Petaling, Sepang, Hulu Langat, Hulu Selangor, Shah Alam'],
+ ['SGR02','Kuala Selangor, Sabak Bernam'],
+ ['SGR03','Klang, Kuala Langat'],
+ ['SWK01','Limbang, Sundar, Trusan, Lawas'],
+ ['SWK02','Miri, Niah, Bekenu, Sibuti, Marudi'],
+ ['SWK03','Pandan, Belaga, Suai, Tatau, Sebauh'],
+ ['SWK04','Sibu, Kanowit, Dalat, Oya'],
+ ['SWK05','Kapit, Song, Balingian'],
+ ['SWK06','Sarikei, Matu, Julau, Rajang'],
+ ['SWK07','Serian, Simunjan, Samarahan'],
+ ['SWK08','Kuching, Bau, Lundu'],
+ ['SWK09','Sri Aman, Lubok Antu, Betong, Saratok'],
+ ['TRG01','Kuala Terengganu, Marang, Kuala Nerus'],
+ ['TRG02','Besut, Setiu'],
+ ['TRG03','Hulu Terengganu'],
+ ['TRG04','Dungun, Kemaman'],
+ ['WLY01','Kuala Lumpur, Putrajaya']
+];
+
 function prayerClock(v){
  if(!v)return '--:--';
  let s=String(v).trim();
@@ -720,37 +779,55 @@ function formatPrayerDate(v){
  const [y,m,day]=d.split('-').map(Number);
  return new Date(Date.UTC(y,m-1,day,12)).toLocaleDateString('ms-MY',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'Asia/Kuala_Lumpur'});
 }
+function zoneCodeOf(z){
+ if(typeof z==='string')return z;
+ return z?.zone||z?.code||z?.kod||z?.zoneCode||z?.jakimCode||z?.jakim_code||z?.id||'';
+}
+function zoneNameOf(z){
+ if(typeof z==='string')return '';
+ return z?.name||z?.location||z?.kawasan||z?.daerah||z?.area||z?.zon||'';
+}
+function fillZoneOptions(list){
+ const sel=el('prayerZoneSelect');
+ const map=new Map();
+ (list||[]).forEach(z=>{
+  const code=String(zoneCodeOf(z)||'').toUpperCase();
+  if(code)map.set(code,zoneNameOf(z));
+ });
+ if(!map.size)FALLBACK_ZONES.forEach(([code,name])=>map.set(code,name));
+ sel.innerHTML='<option value="">-- Pilih zon waktu solat --</option>';
+ [...map.entries()].sort((a,b)=>a[0].localeCompare(b[0])).forEach(([code,name])=>{
+  const o=document.createElement('option');
+  o.value=code;o.textContent=code+(name?' — '+name:'');
+  sel.appendChild(o);
+ });
+ if(prayerZoneCode)sel.value=prayerZoneCode;
+}
 async function loadPrayerZones(){
  const sel=el('prayerZoneSelect');
+ sel.innerHTML='<option value="">Sedang memuatkan zon...</option>';
  try{
-  const res=await fetch(SOLAT_API+'/locations');
+  const res=await fetch(SOLAT_API+'/locations',{cache:'no-store'});
   if(!res.ok)throw new Error('Tidak dapat memuatkan senarai zon');
   const data=await res.json();
-  let list=Array.isArray(data)?data:(data.locations||data.data||[]);
-  sel.innerHTML='<option value="">-- Pilih zon waktu solat --</option>';
-  list.forEach(z=>{
-   const code=z.zone||z.code||z.kod||z.zoneCode;
-   const name=z.name||z.location||z.kawasan||z.daerah||z.area||'';
-   if(!code)return;
-   const o=document.createElement('option');
-   o.value=code;
-   o.textContent=code+(name?' — '+name:'');
-   sel.appendChild(o);
-  });
-  if(prayerZoneCode)sel.value=prayerZoneCode;
+  const list=Array.isArray(data)?data:(data.locations||data.data||data.zones||[]);
+  if(!Array.isArray(list)||!list.length)throw new Error('Senarai zon kosong');
+  prayerLocations=list;
+  fillZoneOptions(list);
  }catch(e){
-  sel.innerHTML='<option value="">Senarai zon tidak dapat dimuatkan</option>';
-  console.warn(e);
+  console.warn('Senarai zon API tidak dapat dimuatkan; guna senarai pilihan simpanan.',e);
+  prayerLocations=FALLBACK_ZONES.map(([zone,name])=>({zone,name}));
+  fillZoneOptions(prayerLocations);
  }
 }
 async function fetchPrayerZone(zone){
  if(!zone)throw new Error('Sila pilih kod zon.');
  el('prayerLocationStatus').textContent='Mengambil data waktu solat...';
- const res=await fetch(SOLAT_API+'/daily/'+encodeURIComponent(zone));
- if(!res.ok)throw new Error('Gagal mengambil waktu solat untuk zon '+zone+' (HTTP '+res.status+')');
+ const res=await fetch(SOLAT_API+'/daily/'+encodeURIComponent(zone),{cache:'no-store'});
+ if(!res.ok)throw new Error('Gagal mengambil jadual zon '+zone+' (HTTP '+res.status+').');
  const data=await res.json();
  const row=findPrayerObject(data);
- if(!row)throw new Error('Format data waktu solat tidak dikenali.');
+ if(!row)throw new Error('Data waktu solat untuk zon '+zone+' tidak ditemui.');
  const get=(...keys)=>{
   for(const k of keys)if(row[k]!==undefined&&row[k]!==null&&row[k]!=='')return row[k];
   return '';
@@ -765,13 +842,19 @@ async function fetchPrayerZone(zone){
   maghrib:get('maghrib'),
   isha:get('isha','isyak')
  };
- if(!times.fajr||!times.dhuhr||!times.maghrib)throw new Error('Data waktu solat tidak lengkap untuk zon '+zone);
- prayerZoneCode=zone;
- prayerTimes=times;
- el('prayerZone').textContent='ZON '+zone;
+ if(!times.fajr||!times.dhuhr||!times.maghrib||!times.isha)
+  throw new Error('Data waktu solat tidak lengkap bagi zon '+zone+'. Sila cuba semula atau pilih zon lain.');
+ prayerZoneCode=zone;prayerTimes=times;
+ let zoneLabel='ZON '+zone;
+ try{
+  const z=prayerLocations.find(x=>zoneCodeOf(x)===zone);
+  if(z&&zoneNameOf(z))zoneLabel=zone+' — '+zoneNameOf(z);
+ }catch(e){}
+ el('prayerZone').textContent=zoneLabel;
  el('prayerDate').textContent=formatPrayerDate(row.date||row.tarikh);
- el('prayerLocationStatus').textContent='Data berjaya dimuatkan · '+zone;
+ el('prayerLocationStatus').textContent='Jadual berjaya dimuatkan · '+zone;
  el('prayerZoneSelect').value=zone;
+ try{localStorage.setItem('rekodPrayerZone',zone)}catch(e){}
  renderPrayerTimes();
  if(prayerTick)clearInterval(prayerTick);
  updatePrayerCountdown();
@@ -793,16 +876,13 @@ function updatePrayerCountdown(){
   const t=prayerClock(prayerTimes[key]);
   if(t==='--:--')continue;
   const [h,m]=t.split(':').map(Number);
-  const at=new Date(now);
-  at.setHours(h,m,0,0);
+  const at=new Date(now);at.setHours(h,m,0,0);
   if(at>now){next={key,name};nextAt=at;break}
  }
  if(!next){
   const [h,m]=prayerClock(prayerTimes.fajr).split(':').map(Number);
   next={key:'fajr',name:'Subuh'};
-  nextAt=new Date(now);
-  nextAt.setDate(nextAt.getDate()+1);
-  nextAt.setHours(h,m,0,0);
+  nextAt=new Date(now);nextAt.setDate(nextAt.getDate()+1);nextAt.setHours(h,m,0,0);
  }
  const sec=Math.max(0,Math.floor((nextAt-now)/1000));
  const hh=String(Math.floor(sec/3600)).padStart(2,'0');
@@ -812,8 +892,7 @@ function updatePrayerCountdown(){
  el('nextPrayerAt').textContent='Masuk pada '+prayerClock(prayerTimes[next.key])+(nextAt.getDate()!==now.getDate()?' · Esok':'');
  el('prayerCountdown').textContent=hh+':'+mm+':'+ss;
  document.querySelectorAll('.prayer-time').forEach(x=>x.classList.remove('active'));
- const active=el('prayer-'+next.key);
- if(active)active.classList.add('active');
+ const active=el('prayer-'+next.key);if(active)active.classList.add('active');
 }
 async function loadPrayerBySelectedZone(){
  const z=el('prayerZoneSelect').value;
@@ -822,40 +901,41 @@ async function loadPrayerBySelectedZone(){
  catch(e){el('prayerLocationStatus').textContent=e.message;alert(e.message)}
 }
 async function detectPrayerLocation(){
- if(!navigator.geolocation){alert('Pelayar ini tidak menyokong pengesanan lokasi.');return}
+ if(!navigator.geolocation){el('prayerLocationStatus').textContent='GPS tidak disokong. Sila pilih zon secara manual.';return}
  el('prayerLocationStatus').textContent='Sedang mengesan lokasi...';
  navigator.geolocation.getCurrentPosition(async pos=>{
   try{
    const url=SOLAT_API+'/detect?latitude='+encodeURIComponent(pos.coords.latitude)+'&longitude='+encodeURIComponent(pos.coords.longitude);
-   const res=await fetch(url);
-   if(!res.ok)throw new Error('Zon tidak dapat dikesan daripada lokasi ini.');
+   const res=await fetch(url,{cache:'no-store'});
+   if(!res.ok)throw new Error('Zon tidak dapat dikesan (HTTP '+res.status+'). Sila pilih zon secara manual.');
    const data=await res.json();
-   const zone=data.zone||data.code||data.location?.zone||data.data?.zone;
-   if(!zone)throw new Error('Kod zon tidak diterima daripada pelayan.');
+   let zone=zoneCodeOf(data.zone)||zoneCodeOf(data.data?.zone)||data.code||data.jakimCode||data.zoneCode;
+   if(!zone&&typeof data.zone==='string')zone=data.zone;
+   if(!zone)throw new Error('Kod zon tidak diterima. Sila pilih zon secara manual.');
    await fetchPrayerZone(zone);
-   el('prayerLocationStatus').textContent='Lokasi dikesan secara automatik · '+zone;
+   el('prayerLocationStatus').textContent='Lokasi berjaya dikesan · '+zone;
   }catch(e){
    el('prayerLocationStatus').textContent=e.message;
    alert(e.message);
   }
  },err=>{
-  let msg=err.code===1?'Akses lokasi ditolak. Sila benarkan lokasi dalam Chrome.':'Lokasi tidak dapat dikesan. Sila pilih zon secara manual.';
+  const msg=err.code===1?'Akses lokasi ditolak. Benarkan lokasi Chrome atau pilih zon secara manual.':'Lokasi tidak dapat dikesan. Sila pilih zon secara manual.';
   el('prayerLocationStatus').textContent=msg;
   alert(msg);
  },{enableHighAccuracy:true,timeout:15000,maximumAge:300000});
 }
 async function initPrayer(){
  await loadPrayerZones();
- try{
-  const remembered=localStorage.getItem('rekodPrayerZone');
-  if(remembered){await fetchPrayerZone(remembered);return}
- }catch(e){}
- el('prayerLocationStatus').textContent='Sila kesan lokasi atau pilih zon.';
+ let remembered='';
+ try{remembered=localStorage.getItem('rekodPrayerZone')||''}catch(e){}
+ if(remembered){
+  try{await fetchPrayerZone(remembered);return}catch(e){console.warn(e)}
+ }
+ el('prayerLocationStatus').textContent='Tekan Kesan Lokasi Terkini atau pilih zon secara manual.';
 }
-const prayerSelectOriginal=el('prayerZoneSelect');
-if(prayerSelectOriginal)prayerSelectOriginal.addEventListener('change',()=>{
- const z=prayerSelectOriginal.value;
- if(z)localStorage.setItem('rekodPrayerZone',z);
+el('prayerZoneSelect').addEventListener('change',()=>{
+ const z=el('prayerZoneSelect').value;
+ if(z){try{localStorage.setItem('rekodPrayerZone',z)}catch(e){}}
 });
 
 /* MUAT SEMUA DATA */
@@ -899,7 +979,7 @@ updateAccess();
 startApp();
 initPrayer().catch(e=>{
  console.warn(e);
- el('prayerLocationStatus').textContent='Tidak dapat memuatkan data waktu solat.';
+ el('prayerLocationStatus').textContent='Tidak dapat memuatkan data waktu solat. Pilih zon secara manual.';
 });
 </script>
 </body>
